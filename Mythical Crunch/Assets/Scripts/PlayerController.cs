@@ -7,6 +7,11 @@ public class PlayerController : MonoBehaviour
 {
     private Rigidbody2D myRB;
     private Animator myAnim;
+    public GameObject bottomLeftLimitGameobject;
+    public GameObject topRightLimitGameobject;
+    public Vector3 bottomLeftLimit;
+    public Vector3 topRightLimit;
+    private Vector2 input;
 
     [SerializeField]
     private float speed;
@@ -15,14 +20,25 @@ public class PlayerController : MonoBehaviour
     {
         myRB = GetComponent<Rigidbody2D>();
         myAnim = GetComponent<Animator>();
+        bottomLeftLimit = bottomLeftLimitGameobject.transform.position;
+        topRightLimit = topRightLimitGameobject.transform.position;
     }
 
     // Update is called once per frame
     void Update()
     {
+        input = new Vector2(CrossPlatformInputManager.GetAxis("Horizontal"), CrossPlatformInputManager.GetAxis("Vertical"));
+        if (transform.position.x <= bottomLeftLimit.x && input.x == -1 || transform.position.x >= topRightLimit.x && input.x == 1)
+        {
+            input.x = 0;
+        }
+        if (transform.position.y <= bottomLeftLimit.y && input.y == -1 || transform.position.y >= topRightLimit.y && input.y == 1)
+        {
+            input.y = 0;
+        }
         // Keyboard
         // myRB.velocity = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized * speed * Time.fixedDeltaTime / transform.localScale.x;
-        myRB.velocity = new Vector2(CrossPlatformInputManager.GetAxis("Horizontal"), CrossPlatformInputManager.GetAxis("Vertical")).normalized * speed * Time.fixedDeltaTime / transform.localScale.x;
+        myRB.velocity = new Vector2(input.x, input.y).normalized * speed * Time.fixedDeltaTime / transform.localScale.x;
 
         myAnim.SetFloat("moveX", myRB.velocity.x);
         myAnim.SetFloat("moveY", myRB.velocity.y);
@@ -33,10 +49,10 @@ public class PlayerController : MonoBehaviour
             myAnim.SetFloat("lastMoveX", Input.GetAxisRaw("Horizontal"));
             myAnim.SetFloat("lastMoveY", Input.GetAxisRaw("Vertical"));
         }*/
-        if (CrossPlatformInputManager.GetAxis("Horizontal") == 1 || CrossPlatformInputManager.GetAxis("Horizontal") == -1 || CrossPlatformInputManager.GetAxis("Vertical") == 1 || CrossPlatformInputManager.GetAxis("Vertical") == -1)
+        if (input.x == 1 || input.x == -1 || input.y == 1 || input.y == -1)
         {
-            myAnim.SetFloat("lastMoveX", CrossPlatformInputManager.GetAxis("Horizontal"));
-            myAnim.SetFloat("lastMoveY", CrossPlatformInputManager.GetAxis("Vertical"));
+            myAnim.SetFloat("lastMoveX", input.x);
+            myAnim.SetFloat("lastMoveY", input.y);
         }
     }
 }
